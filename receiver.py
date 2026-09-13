@@ -4,7 +4,7 @@ class Receiver:
         self.history = []
 
     def observe(self, band, timestep):
-        value = self.env.ground_truth[band, timestep]
+        value = self.env.is_active(band, timestep)
         self.history.append((timestep, band, value))
         return value
 
