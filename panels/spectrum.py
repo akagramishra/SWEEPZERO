@@ -1,4 +1,3 @@
-# panels/spectrum.py
 import numpy as np
 import pyqtgraph as pg
 
@@ -31,21 +30,18 @@ class SpectrumPanel(pg.PlotWidget):
         Active bands get a tall peak; inactive bands get noise-floor.
         """
         spectrum = np.full(512, -100.0)  # noise floor in dBm
-        bins_per_band = 512 // num_bands  # ~51 bins per band
+        bins_per_band = 512 // num_bands
 
         for band, amp in band_data.items():
             if amp > 0:
                 start = band * bins_per_band
                 end = start + bins_per_band
-                # add a peak for this active band
                 center = (start + end) / 2
-                # gaussian peak centered in this band's frequency range
                 peak = 40.0 * np.exp(
                     -((np.arange(512) - center) ** 2) / (2 * (bins_per_band / 3) ** 2)
                 )
                 spectrum += peak
 
-        # add slight noise for realism
         spectrum += self.rng.normal(0, 1.5, size=512)
         return spectrum
 
@@ -53,10 +49,10 @@ class SpectrumPanel(pg.PlotWidget):
         """
         band_data: optional dict {band_index: amplitude}
                    e.g. {0: 0.0, 1: 0.0, 2: 1.0, 3: 1.0, ...}
-                   If None, shows fake demo data (backward compatible).
+                   If None, shows only the noise floor.
         """
         if band_data is None:
-            power = self._bands_to_spectrum({})  # empty = all noise floor
+            power = self._bands_to_spectrum({})
         else:
             power = self._bands_to_spectrum(band_data)
         self.curve.setData(self.freqs, power)

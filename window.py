@@ -1,4 +1,3 @@
-# window.py
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QIcon
@@ -23,10 +22,9 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(icon)
         self.resize(1000, 800)
 
-        # ── Backend ──────────────────────────────────────────
         NUM_BANDS = 10
 
-        self.env = RFEnvironment(num_bands=NUM_BANDS, seed=42)  # live mode
+        self.env = RFEnvironment(num_bands=NUM_BANDS, seed=42)
         self.receiver = Receiver(self.env)
         self.scheduler = AdaptiveScheduler(NUM_BANDS)
         self.current_timestep = 0
@@ -35,7 +33,6 @@ class MainWindow(QMainWindow):
         self.total_misses = 0
         self.running_max_possible = 0
 
-        # ── Panels ───────────────────────────────────────────
         self.sweep = SweepPanel()
         self.spectrum = SpectrumPanel()
         self.stats = StatsPanel()
@@ -70,7 +67,6 @@ class MainWindow(QMainWindow):
         self.row_layout_Footer.addWidget(framed(self.stats, "Statistics"), 40)
         self.row_layout_Footer.addWidget(framed(self.stattile, "Hits"), 20)
 
-        # ── Timer ────────────────────────────────────────────
         self.t = 0.0
         self.dt = 0.033
         self.timer = QTimer(self)
@@ -78,17 +74,13 @@ class MainWindow(QMainWindow):
         self.timer.start(33)
 
     def tick(self):
-        # 1. Scheduler decides next band
         band = self.scheduler.decide(self.current_timestep, self.receiver.history)
 
-        # 2. Receiver scans
         value = self.receiver.observe(band, self.current_timestep)
 
-        # 3. Track running max-possible
         active_now = self.env.active_bands_at(self.current_timestep)
         self.running_max_possible += len(active_now)
 
-        # 4. Update stats
         if value == 1:
             self.total_hits += 1
         else:
@@ -98,12 +90,11 @@ class MainWindow(QMainWindow):
         # crude "confidence" stand-in: hit rate over what's actually been found so far
         confidence = self.total_hits / max(self.running_max_possible, 1)
 
-        # 5. Push to UI — only calling methods that actually exist
         self.header.update_header(self.current_timestep, str(band))
         self.stats.update_stats(self.total_hits, total_scans, confidence)
         self.stattile.set_value(f"{self.total_hits} / {self.running_max_possible}")
 
-        self.sweep.advance()  # self-contained radar animation, no band input yet
+        self.sweep.advance()
 
         freq_data = {
             b: 1.0 if b in active_now else 0.0

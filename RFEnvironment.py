@@ -1,4 +1,3 @@
-# RFEnvironment.py
 import numpy as np
 import random as rd
 
@@ -11,7 +10,6 @@ class Emitter:
         jitter: max random offset added/subtracted from period each cycle
         start_time: timestep this emitter starts existing (for pop-up emitters)
         emitter_id: stable identifier used to seed jitter deterministically
-                    (id(self) was memory-address based, not truly reproducible)
         """
         self.bands = bands if isinstance(bands, list) else [bands]
         self.period = period
@@ -22,15 +20,14 @@ class Emitter:
 
     def get_active_band_at(self, t, rng):
         if t < self.start_time:
-            return None  # ye bas emitter ko sahi time pe start karna.
+            return None
 
-        elapsed = t - self.start_time  # emitter ke POV mein time.
-        cycle_index = elapsed // self.period  # kaunsa cycle chal raha hai
-        cycle_pos = elapsed % self.period  # emitter ki apne period mein posiition.
+        elapsed = t - self.start_time
+        cycle_index = elapsed // self.period
+        cycle_pos = elapsed % self.period
 
-        # Jitter - har cycle pe same hona chahiye, har timestep pe naya nahi.
-        # seeded off emitter_id (not id(self)) so it's actually reproducible
-        # across runs/machines, not just an accident of memory layout.
+        # Jitter is fixed per cycle (not per timestep) and seeded off emitter_id
+        # so it is reproducible across runs.
         if self.jitter:
             seed_val = self.emitter_id * 100000 + cycle_index
             cycle_rng = rd.Random(seed_val)
@@ -54,11 +51,10 @@ class RFEnvironment:
         self.rng = rd.Random(seed)
         self.emitters = emitters if emitters is not None else self._default_emitters()
 
-        # Only pre-generate the grid if a finite length was requested
         if num_timesteps is not None:
             self.ground_truth = self._generate_ground_truth()
         else:
-            self.ground_truth = None  # live mode — no grid
+            self.ground_truth = None
 
     def _default_emitters(self):
         return [
@@ -100,11 +96,9 @@ class RFEnvironment:
         return active
 
 if __name__ == "__main__":
-    # Quick smoke test — live mode
     env = RFEnvironment()
     for t in range(10):
         print(f"t={t}: active bands = {env.active_bands_at(t)}")
 
-    # Grid mode still works
     env2 = RFEnvironment(num_timesteps=50, seed=42)
     print("Grid sum:", env2.ground_truth.sum())

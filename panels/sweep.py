@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QWidget
 class SweepPanel(QWidget):
     RINGS = 5
     TRAIL_DEG = 50
-    RPM = 20
+    RPM = 20 #rads/s
 
     def __init__(self):
         super().__init__()
@@ -39,7 +39,7 @@ class SweepPanel(QWidget):
 
     def paintEvent(self, event):
         p = QPainter(self)
-        p.setRenderHint(QPainter.Antialiasing)
+        p.setRenderHint(QPainter.Antialiasing)#meaning that the edges will be smotoehr
 
         w, h = self.width(), self.height()
         radius = min(w, h) / 2 - 10

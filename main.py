@@ -7,7 +7,7 @@ from window import MainWindow
 
 if __name__ == '__main__':
     
-    if os.name == 'nt': #xclusive for windows os
+    if os.name == 'nt':
         import ctypes
        
         myappid = 'sweepzero.qtapp.v1.0' 

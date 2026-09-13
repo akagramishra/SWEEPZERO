@@ -1,17 +1,13 @@
-# better model since last one sucks.
-
 import numpy as np
 import random
 
 
 class AdaptiveScheduler:
     def __init__(self, num_bands):
-        self.num_bands = num_bands #yk total no of bands available. 
+        self.num_bands = num_bands
 
 
     def _get_hits_by_band(self, receiver_history):
-        # Saari successful predictions ko collect karna and bandwise arrange.
-
         hits_by_band = {
             band: []
             for band in range(self.num_bands)
@@ -25,8 +21,6 @@ class AdaptiveScheduler:
 
 
     def _get_burst_starts(self, hit_times):
-        # this basically acts as a channi to take out successful hits that are of the same burst, and in teh end we have an array containing only unique bursts (their first hits more precisely)
-
         if not hit_times:
             return []
 
@@ -50,14 +44,14 @@ class AdaptiveScheduler:
 
         differences = np.diff(burst_starts)
 
-        return int(np.median(differences)) # average nhi lena chahiye shayad (?)
+        return int(np.median(differences))
 
 
     def _get_last_observed_time(self, band, receiver_history):
         for timestep, observed_band, value in reversed(receiver_history):
             if observed_band == band:
                 return timestep
-        return None    # ye agar bade number pe scale hua to bohot slow ho jayga model (i think?)
+        return None
 
 
     def decide(self, timestep, receiver_history):
@@ -70,11 +64,6 @@ class AdaptiveScheduler:
         for band in range(self.num_bands):
 
             score = 0.0
-
-
-            # -----------------------------------
-            # 1. PERIODICITY SCORE
-            # -----------------------------------
 
             hit_times = hits_by_band[band]
 
@@ -91,8 +80,6 @@ class AdaptiveScheduler:
                 predicted_time = last_burst + period
                 distance = abs(timestep - predicted_time)
 
-                # confidence scales with how many bursts confirmed this period,
-                # capping out at 5 confirming bursts.
                 confidence = min(len(burst_starts) / 5, 1.0)
 
                 if distance <= 1:  # within jitter tolerance, treat as confident
@@ -101,11 +88,6 @@ class AdaptiveScheduler:
                     pattern_score = (1.0 / distance) * confidence
                 score += pattern_score
 
-
-            # -----------------------------------
-            # 2. STALENESS / EXPLORATION SCORE
-            # -----------------------------------
-
             last_checked = self._get_last_observed_time(
                 band,
                 receiver_history
@@ -113,16 +95,11 @@ class AdaptiveScheduler:
 
 
             if last_checked is None:
-
-                # Never checked before
                 exploration_score = 0.5
 
             else:
 
                 time_since_check = timestep - last_checked
-
-                # Score increases the longer
-                # we've ignored this band.
 
                 exploration_score = min(
                     time_since_check / 20,
@@ -135,8 +112,6 @@ class AdaptiveScheduler:
 
             scores[band] = score
 
-
-        # Pick the highest scoring band
 
         best_band = max(
             scores,

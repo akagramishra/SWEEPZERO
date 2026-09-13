@@ -1,5 +1,3 @@
-# here code for logging will be added later
-
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 
 from theme import framed
