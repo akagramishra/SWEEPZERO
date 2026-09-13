@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel
+from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel, QFrame
 from PySide6.QtCore import Qt
 
 

@@ -8,6 +8,7 @@ from panels.sweep import SweepPanel
 from panels.stats import StatsPanel, StatTile
 from headers import HeaderPanel
 from theme import framed
+from panels.actionlog import ActionLogPanel
 
 from RFEnvironment import RFEnvironment
 from receiver import Receiver
@@ -39,6 +40,7 @@ class MainWindow(QMainWindow):
         self.spectrum = SpectrumPanel()
         self.stats = StatsPanel()
         self.stattile = StatTile("Hits", "0 / 0")
+        self.actionlog = ActionLogPanel("Action Log (cs)");
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -55,11 +57,16 @@ class MainWindow(QMainWindow):
         self.row_layout_Middle.setContentsMargins(12, 0, 12, 0)
         self.row_layout_Middle.setSpacing(12)
 
+        self.row_layout_Header.setContentsMargins(12, 0, 12, 0)
+        self.row_layout_Header.setSpacing(12)
+
         self.header = HeaderPanel()
         self.row_layout_Header.addWidget(self.header)
+        self.row_layout_Header.addWidget(self.actionlog, 30)
 
         self.row_layout_Middle.addWidget(framed(self.sweep, "Sweep"), 40)
         self.row_layout_Middle.addWidget(framed(self.spectrum, "RF Spectrum"), 40)
+
         self.row_layout_Footer.addWidget(framed(self.stats, "Statistics"), 40)
         self.row_layout_Footer.addWidget(framed(self.stattile, "Hits"), 20)
 
