@@ -1,4 +1,7 @@
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QFrame
+from PySide6.QtGui import QFont
+
+from theme import mono, ui, INK, INK_DIM, CYAN, GREEN, LINE
 
 
 class HeaderPanel(QWidget):
@@ -6,28 +9,33 @@ class HeaderPanel(QWidget):
         super().__init__()
 
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 0, 12, 0)
-        layout.setSpacing(20)
+        layout.setContentsMargins(16, 10, 16, 10)
+        layout.setSpacing(14)
+
+        # accent bar — anchors the wordmark to the left edge
+        bar = QFrame()
+        bar.setFixedWidth(3)
+        bar.setStyleSheet(f"background: {CYAN}; border: none; border-radius: 1px;")
 
         title = QLabel("EW SCAN CONSOLE")
-        title.setStyleSheet(
-            "color: #e6edf3; font-size: 19px; letter-spacing: 2px;"
-        )
+        title.setFont(ui(21, QFont.Weight.DemiBold, 3.2))
+        title.setStyleSheet(f"color: {INK};")
 
         self.clock = QLabel("T + 000.000 s")
-        self.clock.setStyleSheet(
-            "color: #8b949e; font-family: monospace; font-size: 14px;"
-        )
+        self.clock.setObjectName("chip")
+        self.clock.setFont(mono(13, QFont.Weight.Medium, 0.6))
 
         self.band = QLabel("band: --")
-        self.band.setStyleSheet(
-            "color: #39c5cf; font-family: monospace; font-size: 14px;"
-        )
+        self.band.setObjectName("chipAccent")
+        self.band.setFont(mono(13, QFont.Weight.DemiBold, 0.6))
 
-        self.status = QLabel("● SIM")
-        self.status.setStyleSheet("color: #3fb950; font-size: 15px;")
+        self.status = QLabel("\u25cf  SIM")
+        self.status.setFont(mono(11, QFont.Weight.DemiBold, 1.6))
+        self.status.setStyleSheet(f"color: {GREEN};")
 
+        layout.addWidget(bar)
         layout.addWidget(title)
+        layout.addSpacing(6)
         layout.addWidget(self.clock)
         layout.addWidget(self.band)
         layout.addStretch()

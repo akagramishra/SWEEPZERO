@@ -1,22 +1,48 @@
 import numpy as np
 import pyqtgraph as pg
+from PySide6.QtGui import QLinearGradient, QColor, QBrush
+
+from theme import mono, PANEL_INSET, LINE, INK_FAINT, CYAN, CYAN_RGB
+
 
 class SpectrumPanel(pg.PlotWidget):
     def __init__(self):
         super().__init__()
 
-        self.setBackground("#0d1117")
-        self.setLabel("bottom", "Frequency", units="MHz")
-        self.setLabel("left", "Power", units="dBm")
-        self.showGrid(x=True, y=True, alpha=0.2)
+        self.setBackground(PANEL_INSET)
+
+        label_style = {"color": INK_FAINT, "font-size": "9pt"}
+        self.setLabel("bottom", "Frequency", units="MHz", **label_style)
+        self.setLabel("left", "Power", units="dBm", **label_style)
+
+        for name in ("left", "bottom"):
+            axis = self.getAxis(name)
+            axis.setPen(pg.mkPen(LINE, width=1))
+            axis.setTextPen(pg.mkPen(INK_FAINT))
+            axis.setTickFont(mono(9))
+            axis.enableAutoSIPrefix(False)   # keep real MHz, not "kMHz"
+
+        self.showGrid(x=True, y=True, alpha=0.09)
         self.setYRange(-110, -50)
 
         self.freqs = np.linspace(8000, 12000, 512)
 
+        r, g, b = CYAN_RGB
+
+        # fill fades out toward the noise floor so the trace reads as signal
+        # sitting on top of the floor rather than a solid block of colour
+        fill = QLinearGradient(0, -110, 0, -50)
+        fill.setColorAt(0.0, QColor(r, g, b, 40))
+        fill.setColorAt(0.55, QColor(r, g, b, 75))
+        fill.setColorAt(1.0, QColor(r, g, b, 130))
+
+        # a wide, faint copy of the trace underneath gives it a phosphor bloom
+        self.glow = self.plot(pen=pg.mkPen(QColor(r, g, b, 38), width=7))
+
         self.curve = self.plot(
-            pen=pg.mkPen("#39c5cf", width=1),
+            pen=pg.mkPen(CYAN, width=1.6),
             fillLevel=-110,
-            brush=(57, 197, 207, 40),
+            brush=QBrush(fill),
         )
 
         self.rng = np.random.default_rng(20260911)
@@ -56,3 +82,4 @@ class SpectrumPanel(pg.PlotWidget):
         else:
             power = self._bands_to_spectrum(band_data)
         self.curve.setData(self.freqs, power)
+        self.glow.setData(self.freqs, power)

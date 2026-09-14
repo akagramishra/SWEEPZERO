@@ -3,6 +3,7 @@ import os
 from PySide6.QtWidgets import QApplication
 
 from window import MainWindow
+from theme import APP_QSS, ui
 
 
 if __name__ == '__main__':
@@ -16,6 +17,12 @@ if __name__ == '__main__':
     
 
     app = QApplication(sys.argv)
+
+    # One global stylesheet + one default face for the whole app, so no panel
+    # has to carry its own background or font rules.
+    app.setStyle("Fusion")
+    app.setFont(ui(13))
+    app.setStyleSheet(APP_QSS)
 
     window = MainWindow()
     window.show()
