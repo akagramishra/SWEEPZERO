@@ -169,3 +169,5 @@ class MainWindow(QMainWindow):
 
         self.t += self.dt
         self.current_timestep += 1
+
+

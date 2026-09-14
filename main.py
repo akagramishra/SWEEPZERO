@@ -2,6 +2,8 @@ import sys
 import os
 from PySide6.QtWidgets import QApplication
 
+
+
 from window import MainWindow
 from theme import APP_QSS, ui
 
@@ -17,6 +19,8 @@ if __name__ == '__main__':
     
 
     app = QApplication(sys.argv)
+
+    app.setApplicationName("SweepZero")
 
     # One global stylesheet + one default face for the whole app, so no panel
     # has to carry its own background or font rules.

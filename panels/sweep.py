@@ -12,7 +12,7 @@ from theme import mono, CYAN_RGB, GREEN_RGB
 class SweepPanel(QWidget):
     RINGS = 5
     TRAIL_DEG = 50
-    RPM = 20 #rads/s
+    RPM = 40 #rads/s
 
     def __init__(self):
         super().__init__()
