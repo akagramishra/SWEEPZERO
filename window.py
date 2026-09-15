@@ -1,3 +1,6 @@
+import os
+import sys
+
 from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget
 from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QIcon
@@ -14,10 +17,19 @@ from receiver import Receiver
 from Newscheduler import AdaptiveScheduler
 
 
+def resource_path(*parts):
+    """
+    Locate a bundled file both when running from source and from the
+    packaged .exe (PyInstaller unpacks data files under sys._MEIPASS).
+    """
+    base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base, *parts)
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        icon = QIcon("assets/icon_main.png")
+        icon = QIcon(resource_path("assets", "icon_main.png"))
         self.setWindowTitle("SweepZero")
         self.setWindowIcon(icon)
         self.resize(1180, 840)

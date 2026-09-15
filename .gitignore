@@ -1,3 +1,7 @@
 /__pycache__
 /panel/__pycache__
 SIH_PPT_CONTENT.md
+
+# PyInstaller build output (rebuild with: python -m PyInstaller SweepZero.spec)
+/build/
+/dist/
